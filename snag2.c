@@ -121,7 +121,7 @@ int main() {
                 *fb1_pixel = fb1_data;
                 
                 // Convert to grayscale
-                uint8_t gray = convertPixel(fb0_pixel);
+                uint8_t gray = convertPixel16(fb0_pixel);
                 
                 // Convert grayscale to binary
                 bit_pixel = gray > 127 ? 1 : 0; // should I make this 0b10000000 / 0b00000000
