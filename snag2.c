@@ -11,13 +11,6 @@
 #define FRAMEBUFFER_0 "/dev/fb0"
 #define FRAMEBUFFER_1 "/dev/fb1"
 
-typedef struct {
-    unsigned char red;
-    unsigned char green;
-    unsigned char blue;
-} ColorRGB;
-
-typedef unsigned char Color1bit;
 
 int main() {
     //int cur_page = 1; //TO DO - double buffering
@@ -28,8 +21,8 @@ int main() {
     unsigned int x, y;
     double x_ratio, y_ratio;
     unsigned int x_scaled, y_scaled;
-    uint *fb0_pixel_rgb;
-    Color1bit *fb1_pixel;
+    uint_8 *fb0_pixel_rgb;
+    char *fb1_pixel;
     bool hasChanged;
 
     // Open framebuffer /dev/fb0 for reading
