@@ -6,6 +6,7 @@
 #include <linux/fb.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <string.h>
 
 #define FRAMEBUFFER_0 "/dev/fb0"
