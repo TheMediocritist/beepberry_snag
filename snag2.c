@@ -28,7 +28,7 @@ int main() {
     unsigned int x, y;
     double x_ratio, y_ratio;
     unsigned int x_scaled, y_scaled;
-    ColorRGB *fb0_pixel_rgb;
+    uint *fb0_pixel_rgb;
     Color1bit *fb1_pixel;
     bool hasChanged;
 
