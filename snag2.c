@@ -13,6 +13,25 @@
 #define FRAMEBUFFER_1 "/dev/fb1"
 
 
+int convertPixel16(uint16_t pxl) {
+    // Extract red, green, and blue components
+    uint8_t r = (pxl >> 11) & 0x1F;
+    uint8_t g = (pxl >> 5) & 0x3F;
+    uint8_t b = pxl & 0x1F;
+
+    // Expand the 5-bit and 6-bit values to 8-bit range
+    r = (r << 3) | (r >> 2);
+    g = (g << 2) | (g >> 4);
+    b = (b << 3) | (b >> 2);
+
+    // Convert to grayscale
+    uint8_t gray = 
+        (0.299 * r +
+         0.587 * g +
+         0.114 * b)
+    return gray
+}
+
 int main() {
     //int cur_page = 1; //TO DO - double buffering
     int fb0, fb1;
@@ -22,8 +41,8 @@ int main() {
     unsigned int x, y;
     double x_ratio, y_ratio;
     unsigned int x_scaled, y_scaled;
-    uint_8 *fb0_pixel_rgb;
-    char *fb1_pixel;
+    uint16_t *fb0_pixel;
+    uint8_t *fb1_pixel;
     bool hasChanged;
 
     // Open framebuffer /dev/fb0 for reading
@@ -61,7 +80,7 @@ int main() {
     screen_size_0 = var_info_0.yres_virtual * var_info_0.xres_virtual * var_info_0.bits_per_pixel / 8;
 
     // Calculate screen size in bytes for /dev/fb1
-    screen_size_1 = var_info_1.yres_virtual * var_info_1.xres_virtual * sizeof(Color1bit);// * 2; // Double height for back buffer
+    screen_size_1 = var_info_1.yres_virtual * var_info_1.xres_virtual;// * 2; // Double height for back buffer
 
     // Map the framebuffer memory for /dev/fb0
     fb0_data = mmap(0, screen_size_0, PROT_READ, MAP_PRIVATE, fb0, 0);
@@ -97,20 +116,19 @@ int main() {
                 x_scaled = (unsigned int) (x * x_ratio);
                 y_scaled = (unsigned int) (y * y_ratio);
 
-                // Get pixel from /dev/fb0
-                fb0_pixel_rgb = (ColorRGB *) (fb0_data + (y_scaled * var_info_0.xres_virtual + x_scaled) * sizeof(ColorRGB));
+                // Get pixels from /dev/fb0 and /dev/fb1
+                *fb0_pixel = fb0_data;
+                *fb1_pixel = fb1_data;
                 
-                // Convert RGB to grayscale
-                unsigned char gray = (unsigned char) (0.299 * fb0_pixel_rgb->red +
-                                                      0.587 * fb0_pixel_rgb->green +
-                                                      0.114 * fb0_pixel_rgb->blue);
+                // Convert to grayscale
+                uint8_t gray = convertPixel(fb0_pixel);
                 
                 // Convert grayscale to binary
                 bit_pixel = gray > 127 ? 1 : 0; // should I make this 0b10000000 / 0b00000000
                 
                 // Get pixel from /dev/fb1
                 //fb1_pixel_gray = (ColorGray *) (fb1_data + (y * var_info_1.xres_virtual + x) * sizeof(ColorGray)); // * cur_page
-                fb1_pixel = (Color1bit *) (fb1_data + (y * var_info_1.xres_virtual + x) * sizeof(Color1bit)); // * cur_page
+                
                 
 
                 // Check if the pixel color has changed
@@ -118,6 +136,9 @@ int main() {
                 //if (hasChanged) {
                     *fb1_pixel = bit_pixel;
                 //}
+                
+                ++fb0_pixel;
+                ++fb1_pixel;
             }
         }
 
