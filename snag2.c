@@ -67,7 +67,7 @@ int main() {
     screen_size_0 = var_info_0.yres_virtual * var_info_0.xres_virtual * var_info_0.bits_per_pixel / 8;
 
     // Calculate screen size in bytes for /dev/fb1
-    screen_size_1 = var_info_1.yres_virtual * var_info_1.xres_virtual * sizeof(ColorGray);// * 2; // Double height for back buffer
+    screen_size_1 = var_info_1.yres_virtual * var_info_1.xres_virtual * sizeof(Color1bit);// * 2; // Double height for back buffer
 
     // Map the framebuffer memory for /dev/fb0
     fb0_data = mmap(0, screen_size_0, PROT_READ, MAP_PRIVATE, fb0, 0);
@@ -93,7 +93,7 @@ int main() {
     y_ratio = (double) var_info_0.yres_virtual / 240;
 
     bool running = true;
-    uint_8 bit_pixel; // 1 or 0
+    uint bit_pixel; // 1 or 0
     
     while (running) {
         // Perform pixel copy and scaling
